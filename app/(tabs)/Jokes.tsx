@@ -1,33 +1,80 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, FlatList } from "react-native";
+import { View, Text } from "@/components/Themed";
+import { Button, Provider as PaperProvider } from "react-native-paper";
+import { useNavigation } from "expo-router";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 
-import { Text, View } from "@/components/Themed";
+type JokesTabParamList = {
+  general: {
+    id: number;
+    category: string;
+  };
+  programming: {
+    id: number;
+    category: string;
+  };
+};
+
+type GeneralNavigationProp = BottomTabNavigationProp<
+  JokesTabParamList,
+  "general"
+>;
 
 export default function TabOneScreen() {
+  // const navigation = useNavigation<MaterialBottomTabNavigationProp<generalPageParams,"link">>();
+  const navigation = useNavigation<GeneralNavigationProp>();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View
-        style={styles.separator}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      />
-    </View>
+    <FlatList
+      style={{ width: "100%", padding: 10 }}
+      data={[
+        { id: 1, category: "General" },
+        {
+          id: 2,
+          category: "Programming",
+          link: "jokes/programming",
+        },
+      ]}
+      renderItem={({ item }) => (
+        <PaperProvider>
+          <Button
+            buttonColor="black"
+            rippleColor={"#7E7776"}
+            mode="outlined"
+            style={{
+              marginBottom: 10,
+            }}
+            onPress={() => {
+              navigation.navigate("jokes/general" as keyof JokesTabParamList, {
+                id: item.id,
+                category: item.category,
+              });
+            }}
+          >
+            <View
+              style={{
+                borderWidth: 1,
+                height: 45,
+                marginBottom: 10,
+                borderRadius: 15,
+                flex: 1,
+                width: "100%",
+              }}
+            >
+              <Text
+                style={{
+                  marginLeft: 10,
+                  fontFamily: "monospace",
+                  marginVertical: "auto",
+                  fontSize: 15,
+                }}
+              >
+                {item.category}
+              </Text>
+            </View>
+          </Button>
+        </PaperProvider>
+      )}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%",
-  },
-});
