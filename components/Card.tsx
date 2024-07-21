@@ -1,9 +1,20 @@
 import { View, Text } from "./Themed";
-import { Pressable } from "react-native";
+import { Pressable, ToastAndroid, Platform } from "react-native";
+import { SvgXml } from "react-native-svg";
+import { likedIcon, unlikedIcon } from "@/assets";
+import { useState } from "react";
 interface CardProps {
   data: string;
 }
 const Card = ({ data }: CardProps) => {
+  const [likedPost, setlikedPost] = useState(false);
+  function toggleLike() {
+    if (likedPost) {
+      setlikedPost(false);
+    } else {
+      setlikedPost(true);
+    }
+  }
   return (
     <View
       style={{
@@ -41,10 +52,23 @@ const Card = ({ data }: CardProps) => {
       >
         <Pressable
           onPress={() => {
-            alert("You pressed me");
+            toggleLike();
+            if (Platform.OS === "android") {
+              ToastAndroid.show(
+                likedPost ? "Post Liked" : "Post Unliked",
+                ToastAndroid.SHORT
+              );
+            }
+            if (Platform.OS === "ios") {
+              alert(likedPost ? "Post Liked" : "Post Unliked");
+            }
           }}
         >
-          <Text>Press me</Text>
+          <SvgXml
+            xml={likedPost ? likedIcon : unlikedIcon}
+            width={40}
+            height={40}
+          />
         </Pressable>
       </View>
     </View>
