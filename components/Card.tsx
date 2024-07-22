@@ -1,22 +1,64 @@
 import { View, Text } from "./Themed";
-import { Pressable, ToastAndroid, Platform } from "react-native";
+import { Pressable } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { likedIcon, unlikedIcon } from "@/assets";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import Toast from "react-native-root-toast";
+import swipeDirections, {
+  GestureRecognizerProps,
+} from "react-native-swipe-gestures";
+import GestureRecognizer from "react-native-swipe-gestures";
+import { Jokes } from "@/assets/jokes.ts";
+
 interface CardProps {
-  data: string;
+  data: jokes;
 }
+
+interface jokes {}
 const Card = ({ data }: CardProps) => {
-  const [likedPost, setlikedPost] = useState(false);
+  const [likedPost, setLikedPost] = useState(false);
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+
+  const toastID = useRef<string | null>(null);
+
   function toggleLike() {
-    if (likedPost) {
-      setlikedPost(false);
-    } else {
-      setlikedPost(true);
+    // Toggle the liked state
+    setLikedPost((prev) => !prev);
+
+    // Hide the previous toast if it exists
+    if (toastID.current !== null) {
+      Toast.hide(toastID.current);
     }
+
+    // Show a new toast and save its ID
+    const newToastID = Toast.show(
+      likedPost ? "Removed from Favourites" : "Added to Favourites",
+      {
+        duration: Toast.durations.LONG,
+        position: -100,
+        onHide: () => {
+          toastID.current = null;
+        },
+      }
+    );
+
+    toastID.current = newToastID;
+
+    // swipe gesture handler
   }
+
   return (
-    <View
+    <GestureRecognizer
+      onSwipeLeft={() => {
+        setCurrentCardIndex((prev) => prev + 1);
+      }}
+      onSwipeRight={() => {
+        if (currentCardIndex === 0) return;
+        setCurrentCardIndex((prev) => prev - 1);
+      }}
+      onSwipeUp={() => {
+        console.log("swiped up");
+      }}
       style={{
         flex: 1,
         justifyContent: "center",
@@ -38,7 +80,7 @@ const Card = ({ data }: CardProps) => {
           width: "100%",
         }}
       >
-        <Text>{data}</Text>
+        <Text>{Jokes[currentCardIndex]["setup"]}</Text>
       </View>
       <View
         style={{
@@ -53,15 +95,6 @@ const Card = ({ data }: CardProps) => {
         <Pressable
           onPress={() => {
             toggleLike();
-            if (Platform.OS === "android") {
-              ToastAndroid.show(
-                likedPost ? "Post Liked" : "Post Unliked",
-                ToastAndroid.SHORT
-              );
-            }
-            if (Platform.OS === "ios") {
-              alert(likedPost ? "Post Liked" : "Post Unliked");
-            }
           }}
         >
           <SvgXml
@@ -71,7 +104,7 @@ const Card = ({ data }: CardProps) => {
           />
         </Pressable>
       </View>
-    </View>
+    </GestureRecognizer>
   );
 };
 

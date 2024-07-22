@@ -1,4 +1,12 @@
-const jokes = [
+interface Joke {
+    type:string,
+    setup:string,
+    punchline:string,
+    id:number
+}
+
+export type Jokes = Joke[];
+export const Jokes:Jokes = [
     {
         "type": "general",
         "setup": "Why did the opera singer go sailing?",
@@ -2706,4 +2714,3 @@ const jokes = [
         "id": 30
     }
 ]
-module.exports = { jokes }
