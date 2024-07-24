@@ -1,5 +1,5 @@
 import { View, Text } from "./Themed";
-import { Pressable, Animated, Easing } from "react-native";
+import { Pressable, Animated, Easing, Alert } from "react-native";
 import { SvgXml } from "react-native-svg";
 import {
   downloadIcon,
@@ -13,6 +13,9 @@ import { useState, useRef, useEffect } from "react";
 import Toast from "react-native-root-toast";
 import GestureRecognizer from "react-native-swipe-gestures";
 import { Jokes } from "@/assets/jokes.ts";
+import * as MediaLibrary from "expo-media-library";
+import { captureRef } from "react-native-view-shot";
+import * as Linking from "expo-linking";
 
 interface CardProps {
   Jokes: Jokes;
@@ -25,8 +28,59 @@ const Card = ({ Jokes }: CardProps) => {
   const toastID = useRef<string | null>(null);
 
   const [setupIsVisible, setsetupIsVisible] = useState(true);
+  const [punchlineIsVisible, setpunchlineIsVisible] = useState(false);
+  const [status, requestPermission] = MediaLibrary.usePermissions();
+  const imageRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (status === null || status?.granted === false) {
+      requestPermission();
+    }
+  }, [status, requestPermission]);
+
+  useEffect(() => {
+    setsetupIsVisible(true);
+    setpunchlineIsVisible(false);
+  }, [currentCardIndex, Jokes]);
+
+  async function saveImage() {
+    if (!status?.canAskAgain) {
+      // Provide instructions to the user to enable permissions manually
+      Alert.alert(
+        "Permission Required",
+        "Please enable the required permissions in your app settings.",
+        [
+          { text: "Go to Settings", onPress: () => Linking.openSettings() },
+          { text: "Cancel", style: "cancel" },
+        ]
+      );
+    }
+
+    if (status?.granted) {
+      console.log("Saving image to gallery...");
+      try {
+        setpunchlineIsVisible(true);
+        setsetupIsVisible(true);
+
+        setTimeout(async () => {
+          const image = await captureRef(imageRef, {
+            height: 440,
+            quality: 1,
+          });
+
+          await MediaLibrary.saveToLibraryAsync(image);
+          if (image) {
+            Alert.alert("Image saved to gallery");
+          }
+        });
+      } catch (e) {
+        alert("Error saving image to gallery");
+      }
+    }
+  }
+
   function toggleJoke() {
-    setsetupIsVisible((prev) => !prev);
+    setpunchlineIsVisible((prev) => !prev);
   }
 
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial opacity value: 0 (completely transparent)
@@ -103,6 +157,8 @@ const Card = ({ Jokes }: CardProps) => {
       }}
     >
       <Pressable
+        ref={imageRef}
+        collapsable={false}
         onPress={() => {
           toggleJoke();
         }}
@@ -121,9 +177,9 @@ const Card = ({ Jokes }: CardProps) => {
             color: "white",
           }}
         >
-          {setupIsVisible
-            ? Jokes[currentCardIndex]["setup"]
-            : Jokes[currentCardIndex]["punchline"]}
+          {setupIsVisible && Jokes[currentCardIndex]["setup"]}
+
+          {punchlineIsVisible && "\n" + Jokes[currentCardIndex]["punchline"]}
         </Animated.Text>
       </Pressable>
       <View
@@ -167,7 +223,7 @@ const Card = ({ Jokes }: CardProps) => {
         </Pressable>
         <Pressable
           onPress={() => {
-            alert("downloaded");
+            saveImage();
           }}
         >
           <SvgXml xml={downloadIcon} width={40} height={40} />

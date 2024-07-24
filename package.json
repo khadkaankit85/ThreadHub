@@ -33,7 +33,9 @@
     "react-native-screens": "3.31.1",
     "react-native-svg": "^15.4.0",
     "react-native-swipe-gestures": "^1.0.5",
-    "react-native-web": "~0.19.10"
+    "react-native-web": "~0.19.10",
+    "react-native-view-shot": "3.8.0",
+    "expo-media-library": "~16.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
