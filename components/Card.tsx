@@ -1,25 +1,62 @@
 import { View, Text } from "./Themed";
-import { Pressable } from "react-native";
+import { Pressable, Animated, Easing } from "react-native";
 import { SvgXml } from "react-native-svg";
-import { likedIcon, unlikedIcon } from "@/assets";
-import { useState, useRef } from "react";
+import {
+  downloadIcon,
+  likedIcon,
+  nextIcon,
+  previousIcon,
+  toggleSetupIcon,
+  unlikedIcon,
+} from "@/assets";
+import { useState, useRef, useEffect } from "react";
 import Toast from "react-native-root-toast";
-import swipeDirections, {
-  GestureRecognizerProps,
-} from "react-native-swipe-gestures";
 import GestureRecognizer from "react-native-swipe-gestures";
 import { Jokes } from "@/assets/jokes.ts";
 
 interface CardProps {
-  data: jokes;
+  Jokes: Jokes;
 }
 
-interface jokes {}
-const Card = ({ data }: CardProps) => {
+const Card = ({ Jokes }: CardProps) => {
   const [likedPost, setLikedPost] = useState(false);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
   const toastID = useRef<string | null>(null);
+
+  const [setupIsVisible, setsetupIsVisible] = useState(true);
+  function toggleJoke() {
+    setsetupIsVisible((prev) => !prev);
+  }
+
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial opacity value: 0 (completely transparent)
+
+  useEffect(() => {
+    console.log("Animating fade in...");
+    Animated.timing(fadeAnim, {
+      toValue: 1, // Target opacity value: 1 (completely opaque)
+      duration: 1000, // Duration of the animation (1 second)
+      useNativeDriver: true, // Use native driver for better performance
+    }).start(() => {
+      console.log("Fade in animation completed.");
+    });
+  }, [currentCardIndex]);
+
+  // change jokes
+  function getPreviousJoke() {
+    if (currentCardIndex === 0) return;
+
+    setCurrentCardIndex((prev) => prev - 1);
+    setsetupIsVisible(true);
+    fadeAnim.setValue(0); // Reset fadeAnim value to 0
+  }
+  function getNextJoke() {
+    if (currentCardIndex === Jokes.length - 1) return;
+
+    setCurrentCardIndex((prev) => prev + 1);
+    setsetupIsVisible(true);
+    fadeAnim.setValue(0); // Reset fadeAnim value to 0
+  }
 
   function toggleLike() {
     // Toggle the liked state
@@ -41,23 +78,19 @@ const Card = ({ data }: CardProps) => {
         },
       }
     );
-
     toastID.current = newToastID;
-
-    // swipe gesture handler
   }
 
   return (
     <GestureRecognizer
       onSwipeLeft={() => {
-        setCurrentCardIndex((prev) => prev + 1);
+        getNextJoke();
       }}
       onSwipeRight={() => {
-        if (currentCardIndex === 0) return;
-        setCurrentCardIndex((prev) => prev - 1);
+        getPreviousJoke();
       }}
       onSwipeUp={() => {
-        console.log("swiped up");
+        toggleJoke();
       }}
       style={{
         flex: 1,
@@ -65,33 +98,55 @@ const Card = ({ data }: CardProps) => {
         alignItems: "center",
         width: "100%",
         height: 500,
-        backgroundColor: "blue",
         flexDirection: "column",
+        backgroundColor: "black",
       }}
     >
-      <View
+      <Pressable
+        onPress={() => {
+          toggleJoke();
+        }}
         style={{
-          borderColor: "white",
-          borderWidth: 10,
           flex: 2 / 3,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "red",
           width: "100%",
         }}
       >
-        <Text>{Jokes[currentCardIndex]["setup"]}</Text>
-      </View>
+        <Animated.Text
+          style={{
+            textAlign: "center",
+            width: "100%",
+            opacity: fadeAnim,
+            color: "white",
+          }}
+        >
+          {setupIsVisible
+            ? Jokes[currentCardIndex]["setup"]
+            : Jokes[currentCardIndex]["punchline"]}
+        </Animated.Text>
+      </Pressable>
       <View
         style={{
           flex: 1 / 3,
-          backgroundColor: "green",
-          borderColor: "white",
           width: "100%",
-          borderWidth: 10,
-          alignItems: "center",
+          alignItems: "flex-start",
+          flexDirection: "row",
+          justifyContent: "center",
+          gap: 20,
+          backgroundColor: "rgba(100,0,100,0.1)",
+          borderColor: "rgba(100,0,100,0.1)",
+          marginTop: 10,
+          paddingTop: 10,
         }}
       >
+        <Pressable
+          onPress={() => {
+            getPreviousJoke();
+          }}
+        >
+          <SvgXml xml={previousIcon} width={43} height={43} />
+        </Pressable>
         <Pressable
           onPress={() => {
             toggleLike();
@@ -99,9 +154,30 @@ const Card = ({ data }: CardProps) => {
         >
           <SvgXml
             xml={likedPost ? likedIcon : unlikedIcon}
-            width={40}
-            height={40}
+            width={38}
+            height={38}
           />
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            toggleJoke();
+          }}
+        >
+          <SvgXml xml={toggleSetupIcon} width={35} height={35} />
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            alert("downloaded");
+          }}
+        >
+          <SvgXml xml={downloadIcon} width={40} height={40} />
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            getNextJoke();
+          }}
+        >
+          <SvgXml xml={nextIcon} width={43} height={43} />
         </Pressable>
       </View>
     </GestureRecognizer>

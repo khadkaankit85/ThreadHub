@@ -1,14 +1,21 @@
 import { View, Text } from "@/components/Themed";
 import { useLocalSearchParams } from "expo-router";
 import Card from "@/components/Card";
+import { generalJokes, programmingJokes } from "@/assets/jokes";
+
+type paramTypes = {
+  id: number;
+  category: "General" | "Programming";
+};
 const general = () => {
-  const params = useLocalSearchParams();
+  const params: paramTypes = useLocalSearchParams() as unknown as paramTypes;
   const { id, category } = params;
 
   return (
     <View
       style={{
         flex: 1,
+        backgroundColor: "rgba(100,0,100,0.1)",
       }}
     >
       <Text
@@ -23,7 +30,9 @@ const general = () => {
         {` ${category}`}
       </Text>
 
-      <Card data="this is the fuking data lorem55 this is the fuking data lorem55 this is the fuking data lorem55 this is the fuking data lorem55 this is the fuking data lorem55 this is the fuking data lorem55 this is the fuking data lorem55 this is the fuking data lorem55 this is the fuking data lorem55 this is the fuking data lorem55 this is the fuking data lorem55 " />
+      <Card
+        Jokes={category === "Programming" ? programmingJokes : generalJokes}
+      />
     </View>
   );
 };
