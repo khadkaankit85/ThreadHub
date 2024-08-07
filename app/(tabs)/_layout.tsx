@@ -56,7 +56,7 @@ export default function TabLayout() {
                   width: 40,
                   height: 40,
                   flex: 1,
-                  backgroundColor: "black",
+                  backgroundColor: colorScheme === "dark" ? "black" : "white",
                 }}
               >
                 <SvgXml

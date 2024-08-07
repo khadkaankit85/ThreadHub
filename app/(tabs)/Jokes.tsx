@@ -3,7 +3,7 @@ import { View, Text } from "@/components/Themed";
 import { Button, Provider as PaperProvider } from "react-native-paper";
 import { useNavigation } from "expo-router";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
-
+import { useColorScheme } from "react-native";
 type JokesTabParamList = {
   general: {
     id: number;
@@ -21,12 +21,16 @@ type GeneralNavigationProp = BottomTabNavigationProp<
 >;
 
 export default function TabOneScreen() {
+  const Theme = useColorScheme();
   // const navigation = useNavigation<MaterialBottomTabNavigationProp<generalPageParams,"link">>();
   const navigation = useNavigation<GeneralNavigationProp>();
 
   return (
     <FlatList
-      style={{ width: "100%", padding: 10 }}
+      style={{
+        width: "100%",
+        padding: 10,
+      }}
       data={[
         { id: 1, category: "General" },
         {
@@ -59,6 +63,7 @@ export default function TabOneScreen() {
                 borderRadius: 15,
                 flex: 1,
                 width: "100%",
+                backgroundColor: Theme === "light" ? "black" : "black",
               }}
             >
               <Text
@@ -67,6 +72,7 @@ export default function TabOneScreen() {
                   fontFamily: "monospace",
                   marginVertical: "auto",
                   fontSize: 15,
+                  color: "white",
                 }}
               >
                 {item.category}
