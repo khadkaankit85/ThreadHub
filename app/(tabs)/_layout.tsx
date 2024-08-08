@@ -39,7 +39,6 @@ export default function TabLayout() {
           title: "Jokes",
           tabBarLabelStyle: {
             fontSize: 15,
-            fontFamily: "Poppins_400Regular",
           },
 
           tabBarIcon: ({ color }) => (
@@ -74,7 +73,6 @@ export default function TabLayout() {
         options={{
           tabBarLabelStyle: {
             fontSize: 15,
-            fontFamily: "Poppins_400Regular",
           },
           tabBarIcon: ({ color }) => (
             <SvgXml

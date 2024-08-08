@@ -6,6 +6,7 @@ export default function ModalScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
+      <Text>This is the modal</Text>
     </View>
   );
 }

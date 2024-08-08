@@ -16,11 +16,11 @@ import { Jokes } from "@/assets/jokes.ts";
 import * as MediaLibrary from "expo-media-library";
 import { captureRef } from "react-native-view-shot";
 import * as Linking from "expo-linking";
+import Svg, { Path } from "react-native-svg";
 
 interface CardProps {
   Jokes: Jokes;
 }
-
 const Card = ({ Jokes }: CardProps) => {
   const [likedPost, setLikedPost] = useState(false);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -30,7 +30,6 @@ const Card = ({ Jokes }: CardProps) => {
   const [punchlineIsVisible, setPunchlineIsVisible] = useState(false);
   const [status, requestPermission] = MediaLibrary.usePermissions();
   const imageRef = useRef<any>(null);
-
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -38,7 +37,6 @@ const Card = ({ Jokes }: CardProps) => {
       requestPermission();
     }
   }, [status, requestPermission]);
-
   useEffect(() => {
     setSetupIsVisible(true);
     setPunchlineIsVisible(false);
@@ -46,7 +44,7 @@ const Card = ({ Jokes }: CardProps) => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 1000,
-      useNativeDriver: true,
+      useNativeDriver: false,
     }).start();
   }, [currentCardIndex]);
 
@@ -92,6 +90,7 @@ const Card = ({ Jokes }: CardProps) => {
   }
 
   function getNextJoke() {
+    console.log("next joke");
     if (currentCardIndex < Jokes.length - 1) {
       setCurrentCardIndex((prev) => prev + 1);
       setSetupIsVisible(true);
@@ -120,72 +119,34 @@ const Card = ({ Jokes }: CardProps) => {
   }
 
   return (
-    <GestureRecognizer
-      onSwipeLeft={getNextJoke}
-      onSwipeRight={getPreviousJoke}
-      onSwipeUp={toggleJoke}
+    <View
       style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        flex: 1 / 3,
         width: "100%",
-        height: 500,
-        flexDirection: "column",
-        backgroundColor: "black",
+        alignItems: "flex-start",
+        flexDirection: "row",
+        justifyContent: "center",
+        gap: 20,
+        backgroundColor: "rgba(100,0,100,0.1)",
+        borderColor: "rgba(100,0,100,0.1)",
+        marginTop: 10,
+        paddingTop: 10,
       }}
     >
-      <Pressable
-        ref={imageRef}
-        collapsable={false}
-        onPress={toggleJoke}
-        style={{
-          flex: 2 / 3,
-          justifyContent: "center",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        <Animated.Text
-          style={{
-            textAlign: "center",
-            width: "100%",
-            opacity: fadeAnim,
-            color: "white",
-          }}
-        >
-          {setupIsVisible && Jokes[currentCardIndex]?.setup}
-          {punchlineIsVisible && "\n" + Jokes[currentCardIndex]?.punchline}
-        </Animated.Text>
-      </Pressable>
-      <View
-        style={{
-          flex: 1 / 3,
-          width: "100%",
-          alignItems: "flex-start",
-          flexDirection: "row",
-          justifyContent: "center",
-          gap: 20,
-          backgroundColor: "rgba(100,0,100,0.1)",
-          borderColor: "rgba(100,0,100,0.1)",
-          marginTop: 10,
-          paddingTop: 10,
-        }}
-      >
-        <Pressable onPress={getPreviousJoke}>
+      <Pressable onPress={toggleLike}>
+        <Pressable onPress={toggleLike}>
+          <Svg width="100" height="100" viewBox="0 0 256 256">
+            <Path
+              d="M25,47.30078l-0.64062,-0.53125c-1.21484,-1.01562 -2.85937,-2.11719 -4.76562,-3.39062c-7.42578,-4.97266 -17.59375,-11.77734 -17.59375,-23.37891c0,-7.16797 5.83203,-13 13,-13c3.89453,0 7.54297,1.73438 10,4.69922c2.45703,-2.96484 6.10547,-4.69922 10,-4.69922c7.16797,0 13,5.83203 13,13c0,11.60156 -10.16797,18.40625 -17.59375,23.37891c-1.90625,1.27344 -3.55078,2.375 -4.76562,3.39063z"
+              fill="#ffffff"
+            />
+          </Svg>
+        </Pressable>
+        <Pressable onPress={toggleLike}>
           <SvgXml xml={previousIcon} width={43} height={43} />
         </Pressable>
-        <Pressable onPress={toggleLike}></Pressable>
-        <Pressable onPress={toggleJoke}>
-          <SvgXml xml={toggleSetupIcon} width={35} height={35} />
-        </Pressable>
-        <Pressable onPress={saveImage}>
-          <SvgXml xml={downloadIcon} width={40} height={40} />
-        </Pressable>
-        <Pressable onPress={getNextJoke}>
-          <SvgXml xml={nextIcon} width={43} height={43} />
-        </Pressable>
-      </View>
-    </GestureRecognizer>
+      </Pressable>
+    </View>
   );
 };
 

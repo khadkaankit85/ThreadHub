@@ -13,13 +13,19 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.khadkaankit85.ThreadHub"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#000000"
+      },
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "package": "com.khadkaankit85.ThreadHub"
     },
     "web": {
       "bundler": "metro",
@@ -27,10 +33,27 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "28e1c4d6-970a-4298-bb9d-da7b64ea6368"
+      }
+    },
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "url": "https://u.expo.dev/28e1c4d6-970a-4298-bb9d-da7b64ea6368"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }
